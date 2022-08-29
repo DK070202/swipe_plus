@@ -9,7 +9,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -34,26 +34,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xffFFFBFE),
         elevation: 10,
         title: Text(widget.title),
       ),
       body: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          itemBuilder: (context, index) => Builder(builder: (context) {
-                return MessageWidget(
-                  textMessage: faker.lorem.sentence(),
-                );
-              })),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        itemBuilder: (context, index) => MessageWidget(
+          textMessage: faker.lorem.sentence(),
+        ),
       ),
     );
   }
@@ -61,9 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
-    Key? key,
+    super.key,
     required this.textMessage,
-  }) : super(key: key);
+  });
   final String textMessage;
 
   @override
@@ -71,6 +64,13 @@ class MessageWidget extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final x = Random().nextBool();
     return DragAndSwipe(
+      onDragComplete: () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Reply to $textMessage'),
+          behavior: SnackBarBehavior.floating,
+        ));
+      },
+      maxTranslation: .3,
       alignment: x ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
