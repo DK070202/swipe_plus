@@ -61,7 +61,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     });
   }
 
-  void onCancel() {
+  void onDidNotMatchThreshold() {
     shiftedOffset = 0;
     animationController.reverse().then((value) {
       widget.onLeftSwipeCancel?.call();
@@ -76,7 +76,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
         if (animationController.status == AnimationStatus.completed) {
           onMatchThreshold();
         } else {
-          onCancel();
+          onDidNotMatchThreshold();
         }
       },
       child: AnimatedBuilder(
