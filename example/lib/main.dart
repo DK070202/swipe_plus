@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drag_and_swipe/drag_and_swipe.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +16,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Drag And Swipe'),
     );
   }
 }
@@ -31,42 +34,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  void _incrementCounter() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 10,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            for (var i = 0; i < 10; i++)
-              DragAndSwipe(
-                alignment: Alignment.centerRight,
-                onLeftSwipeComplete: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10,
-                    left: 10,
-                    right: 10,
-                  ),
-                  child: MessageWidget(
-                    textMessage: faker.lorem.sentence(),
-                  ),
-                ),
-              )
-          ],
-        ),
-      ),
+      body: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          itemBuilder: (context, index) => Builder(builder: (context) {
+                return MessageWidget(
+                  textMessage: faker.lorem.sentence(),
+                );
+              })),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
@@ -85,13 +68,27 @@ class MessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.circular(12),
+    final size = MediaQuery.of(context).size;
+    final x = Random().nextBool();
+    return DragAndSwipe(
+      alignment: x ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: size.width * .60,
+        ),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xffFFD8E4),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            textMessage,
+            style: const TextStyle(color: Color(0xff31111D)),
+          ),
+        ),
       ),
-      child: Text(textMessage),
     );
   }
 }

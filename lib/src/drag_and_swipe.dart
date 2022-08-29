@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class DragAndSwipe extends StatefulWidget {
@@ -31,9 +33,9 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     animationController = AnimationController(
         vsync: this,
         lowerBound: 0,
-        upperBound: .5,
+        upperBound: .3,
         reverseDuration: const Duration(milliseconds: 150));
-    swipeTween = Tween<double>(begin: 0, end: .5).animate(CurvedAnimation(
+    swipeTween = Tween<double>(begin: 0, end: .3).animate(CurvedAnimation(
       parent: animationController,
       curve: const Cubic(0, .78, 1, .99),
     ));
@@ -43,10 +45,16 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPersistentFrameCallback((timeStamp) {
+    scheduleMicrotask(() {
       final box = sizeMapperKey.currentContext!.findRenderObject() as RenderBox;
       size = box.size;
     });
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
@@ -54,16 +62,21 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     animationController.value = shiftedOffset / size.width;
   }
 
-  void onMatchThreshold() {
+  void resetValues(VoidCallback? onReset) {
     shiftedOffset = 0;
     animationController.reverse().then((value) {
+      onReset?.call();
+    });
+  }
+
+  void onMatchThreshold() {
+    resetValues(() {
       widget.onLeftSwipeComplete?.call();
     });
   }
 
   void onDidNotMatchThreshold() {
-    shiftedOffset = 0;
-    animationController.reverse().then((value) {
+    resetValues(() {
       widget.onLeftSwipeCancel?.call();
     });
   }
