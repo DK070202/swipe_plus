@@ -59,7 +59,7 @@ class DragAndSwipe extends StatefulWidget {
 class _DragAndSwipeState extends State<DragAndSwipe>
     with SingleTickerProviderStateMixin {
   /// Controller for [swipeTween].
-  late final AnimationController animationController;
+  AnimationController? animationController;
 
   /// The Tween for translation animation.
   Animation<double>? swipeTween;
@@ -76,19 +76,8 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      reverseDuration: widget.reverseDuration,
-    );
-
-    // When value of animation is 1, at that time the value of tween will .3
-    // this plays trick for dragging defined portion of child.
-    swipeTween = Tween<double>(begin: 0, end: widget.maxTranslation).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: const Cubic(0, .78, 1, .99),
-      ),
-    );
+    setupAnimationController();
+    setupTween();
   }
 
   @override
@@ -100,20 +89,43 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   @override
   void didUpdateWidget(covariant DragAndSwipe oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.maxTranslation != oldWidget.maxTranslation) {
-      swipeTween = Tween<double>(begin: 0, end: widget.maxTranslation).animate(
-        CurvedAnimation(
-          parent: animationController,
-          curve: const Cubic(0, .78, 1, .99),
-        ),
-      );
+    if (widget.maxTranslation != oldWidget.maxTranslation) setupTween();
+    if (widget.reverseDuration != oldWidget.reverseDuration) {
+      setupAnimationController();
     }
   }
 
   @override
   void dispose() {
-    animationController.dispose();
+    animationController!.dispose();
     super.dispose();
+  }
+
+  /// Assigns and updates the [AnimationController] to [animationController].
+  ///
+  /// The value of [DragAndSwipe.reverseDuration] might be change and in that
+  /// case it will update the animationController.
+  void setupAnimationController() {
+    animationController = AnimationController(
+      vsync: this,
+      reverseDuration: widget.reverseDuration,
+    );
+  }
+
+  /// Creates tween.
+  ///
+  /// When value of animation is 1, at that time the value of tween will
+  /// [DragAndSwipe.maxTranslation] this plays trick for dragging defined
+  /// percentage of child.
+  void setupTween() {
+    assert(animationController != null,
+        'Initialize animation controller before setting up tween.');
+    swipeTween = Tween<double>(begin: 0, end: widget.maxTranslation).animate(
+      CurvedAnimation(
+        parent: animationController!,
+        curve: const Cubic(0, .78, 1, .99),
+      ),
+    );
   }
 
   /// Maps child dimension with help of [sizeMapperKey].
@@ -134,14 +146,14 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   /// will be the 1/3 of the width of child.
   void onHorizontalDragUpdate(DragUpdateDetails details) {
     shiftedOffset += details.delta.dx;
-    animationController.value = shiftedOffset / size.width;
+    animationController!.value = shiftedOffset / size.width;
   }
 
   /// Resets [shiftedOffset],reverses the [swipeTween] and after completing it
   /// calls [onReset] callback.
   void resetValues(VoidCallback? onReset) {
     shiftedOffset = 0;
-    animationController.reverse().then((value) {
+    animationController!.reverse().then((value) {
       onReset?.call();
     });
   }
@@ -167,7 +179,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     return GestureDetector(
       onHorizontalDragUpdate: onHorizontalDragUpdate,
       onHorizontalDragEnd: (details) {
-        if (animationController.value > widget.minThreshold) {
+        if (animationController!.value > widget.minThreshold) {
           onMatchThreshold();
         } else {
           onDidNotMatchThreshold();
@@ -176,7 +188,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
       child: AnimatedBuilder(
         animation: swipeTween!,
 
-        // For avoid rebuilding whole subtree.
+        // For avoid rebuilding in subtree.
         builder: (context, child) => Transform.translate(
           offset: Offset(swipeTween!.value * size.width, 0),
           child: child,

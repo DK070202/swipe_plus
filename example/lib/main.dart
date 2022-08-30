@@ -71,6 +71,7 @@ class MessageWidget extends StatelessWidget {
         ));
       },
       maxTranslation: .3,
+      minThreshold: .50,
       alignment: x ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
