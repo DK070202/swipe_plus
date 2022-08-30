@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 /// Default value for reverse animation duration of widget translation.
@@ -81,12 +79,6 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    mapChidDimension();
-  }
-
-  @override
   void didUpdateWidget(covariant DragAndSwipe oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.maxTranslation != oldWidget.maxTranslation) setupTween();
@@ -132,10 +124,8 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   ///
   /// Calculates the child dimension after after build method.
   void mapChidDimension() {
-    scheduleMicrotask(() {
-      final box = sizeMapperKey.currentContext!.findRenderObject() as RenderBox;
-      size = box.size;
-    });
+    final box = sizeMapperKey.currentContext!.findRenderObject() as RenderBox;
+    size = box.size;
   }
 
   /// Updates the value [shiftedOffset] and [animationController].
@@ -145,6 +135,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   /// the width of the provided child. At that moment the amount of translation
   /// will be the 1/3 of the width of child.
   void onHorizontalDragUpdate(DragUpdateDetails details) {
+    mapChidDimension();
     shiftedOffset += details.delta.dx;
     animationController!.value = shiftedOffset / size.width;
   }
