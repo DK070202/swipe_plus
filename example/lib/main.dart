@@ -59,17 +59,19 @@ class MessageWidget extends StatelessWidget {
   });
   final String textMessage;
 
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Reply to $textMessage'),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final x = Random().nextBool();
     return DragAndSwipe(
-      onDragComplete: () {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Reply to $textMessage'),
-          behavior: SnackBarBehavior.floating,
-        ));
-      },
+      onDragComplete: () => showSnackBar(context, textMessage),
       maxTranslation: .3,
       minThreshold: .50,
       alignment: x ? Alignment.centerRight : Alignment.centerLeft,
