@@ -133,7 +133,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   /// Updates the animationController in relative to the size of child. When we
   /// will drag it horizontally and when value of [shiftedOffset] is equal to
   /// the width of the provided child. At that moment the amount of translation
-  /// will be the 1/3 of the width of child.
+  /// will be the 1/[DragAndSwipe.maxTranslation] of the width of child.
   void onHorizontalDragUpdate(DragUpdateDetails details) {
     mapChidDimension();
     shiftedOffset += details.delta.dx;
