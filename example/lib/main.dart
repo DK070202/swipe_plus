@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:drag_and_swipe/drag_and_swipe.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
+import 'package:swipe_plus/swipe_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -70,7 +70,7 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final x = Random().nextBool();
-    return DragAndSwipe(
+    return SwipePlus(
       onDragComplete: () => showSnackBar(context, textMessage),
       maxTranslation: .3,
       minThreshold: .50,
