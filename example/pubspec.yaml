@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  drag_and_swipe: 
+  swipe_plus: 
     path: ../
   faker: ^2.0.0
 

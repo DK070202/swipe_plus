@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Drag directions.
+enum DragDirection {
+  /// For left to right drag.
+  LTR,
+
+  /// For right to left drag.
+  RTL,
+}
+
 /// Default value for reverse animation duration of widget translation.
 const _kReverseDuration = Duration(milliseconds: 150);
 
@@ -9,8 +18,8 @@ const _kMaxTranslation = .3;
 /// Default value for min translation threshold.
 const _kMinDragThreshold = .70;
 
-class DragAndSwipe extends StatefulWidget {
-  const DragAndSwipe({
+class SwipePlus extends StatefulWidget {
+  const SwipePlus({
     super.key,
     required this.child,
     this.onDragComplete,
@@ -19,6 +28,7 @@ class DragAndSwipe extends StatefulWidget {
     this.reverseDuration = _kReverseDuration,
     this.maxTranslation = _kMaxTranslation,
     this.minThreshold = _kMinDragThreshold,
+    this.dragDirection = DragDirection.LTR,
   }) : assert(maxTranslation != 0);
 
   /// A call back for swipe completion.
@@ -34,27 +44,45 @@ class DragAndSwipe extends StatefulWidget {
 
   /// For aligning child.
   ///
-  /// This widget uses [Align] internally to set Alignment of Widget and widget
-  /// can be available better to the hitTest/GestureRecognition.
+  /// This uses [Align] and [ColoredBox] internally to set Alignment of Widget
+  /// so, the complete area of widget including whitespace can be available for
+  /// hit-test.
   final Alignment alignment;
 
-  /// Value of percentage translation of child to call [onDragComplete].
+  /// It decides the drag direction of child.
+  ///
+  /// * If [DragDirection.RTL] then it can dragged from right side to left side.
+  /// * If [DragDirection.LTR] then it can be dragged from left to to right.
+  final DragDirection dragDirection;
+
+  /// Value of width percentage,for max translation in direction.
+  ///
+  /// It defines bounds of translation in direction. If it is set to .3 then at
+  /// max drag you will able to translate 30% of [child] size in any direction.
   final double maxTranslation;
 
   /// Duration for reverse translation.
+  ///
+  /// If drag not completes or if it not crosses the [minThreshold] percentage
+  /// of width then it play reverse animation with [reverseDuration] duration.
   final Duration reverseDuration;
 
-  /// A percentage that defines minThreshold for calling [onDragComplete].
+  /// A percentage of minThreshold for calling [onDragComplete].
+  ///
+  /// It helps to define boundary for calling [onDragComplete]. If it is set
+  /// to .2 and the value of [maxTranslation] is set to .3 then if we leave drag
+  /// drag handle at grater than 15% of translation it will consider this action
+  /// as threshold.
   final double minThreshold;
 
   /// Proxy widget.
   final Widget child;
 
   @override
-  State<DragAndSwipe> createState() => _DragAndSwipeState();
+  State<SwipePlus> createState() => _SwipePlusState();
 }
 
-class _DragAndSwipeState extends State<DragAndSwipe>
+class _SwipePlusState extends State<SwipePlus>
     with SingleTickerProviderStateMixin {
   /// Controller for [swipeTween].
   AnimationController? animationController;
@@ -79,7 +107,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   }
 
   @override
-  void didUpdateWidget(covariant DragAndSwipe oldWidget) {
+  void didUpdateWidget(covariant SwipePlus oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.maxTranslation != oldWidget.maxTranslation) setupTween();
     if (widget.reverseDuration != oldWidget.reverseDuration) {
@@ -95,7 +123,7 @@ class _DragAndSwipeState extends State<DragAndSwipe>
 
   /// Assigns and updates the [AnimationController] to [animationController].
   ///
-  /// The value of [DragAndSwipe.reverseDuration] might be change and in that
+  /// The value of [SwipePlus.reverseDuration] might be change and in that
   /// case it will update the animationController.
   void setupAnimationController() {
     animationController = AnimationController(
@@ -104,15 +132,26 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     );
   }
 
+  /// Calculate maxTranslation according direction.
+  double getMaxTranslation(DragDirection dragDirection) {
+    switch (dragDirection) {
+      case DragDirection.RTL:
+        return -widget.maxTranslation;
+      case DragDirection.LTR:
+        return widget.maxTranslation;
+    }
+  }
+
   /// Creates tween.
   ///
   /// When value of animation is 1, at that time the value of tween will
-  /// [DragAndSwipe.maxTranslation] this plays trick for dragging defined
+  /// [SwipePlus.maxTranslation] this plays trick for dragging defined
   /// percentage of child.
   void setupTween() {
     assert(animationController != null,
         'Initialize animation controller before setting up tween.');
-    swipeTween = Tween<double>(begin: 0, end: widget.maxTranslation).animate(
+    final maxTranslation = getMaxTranslation(widget.dragDirection);
+    swipeTween = Tween<double>(begin: 0, end: maxTranslation).animate(
       CurvedAnimation(
         parent: animationController!,
         curve: const Cubic(0, .78, 1, .99),
@@ -133,10 +172,20 @@ class _DragAndSwipeState extends State<DragAndSwipe>
   /// Updates the animationController in relative to the size of child. When we
   /// will drag it horizontally and when value of [shiftedOffset] is equal to
   /// the width of the provided child. At that moment the amount of translation
-  /// will be the 1/[DragAndSwipe.maxTranslation] of the width of child.
+  /// will be the 1/[SwipePlus.maxTranslation] of the width of child.
+  ///
+  /// If direction is [DragDirection.RTL], then it will convert shiftedOffset
+  /// into positive by subtracting it.
   void onHorizontalDragUpdate(DragUpdateDetails details) {
     mapChidDimension();
-    shiftedOffset += details.delta.dx;
+    switch (widget.dragDirection) {
+      case DragDirection.RTL:
+        shiftedOffset -= details.delta.dx;
+        break;
+      case DragDirection.LTR:
+        shiftedOffset += details.delta.dx;
+        break;
+    }
     animationController!.value = shiftedOffset / size.width;
   }
 
@@ -165,17 +214,23 @@ class _DragAndSwipeState extends State<DragAndSwipe>
     });
   }
 
+  /// Decides the completion of the action. At the moment of drag completion
+  ///  if the value of [animationController] is greater than value of
+  /// [SwipePlus.minThreshold] then it will call [onMatchThreshold] call back
+  /// else [onDidNotMatchThreshold].
+  void onDragComplete(DragEndDetails details) {
+    if (animationController!.value > widget.minThreshold) {
+      onMatchThreshold();
+    } else {
+      onDidNotMatchThreshold();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragUpdate: onHorizontalDragUpdate,
-      onHorizontalDragEnd: (details) {
-        if (animationController!.value > widget.minThreshold) {
-          onMatchThreshold();
-        } else {
-          onDidNotMatchThreshold();
-        }
-      },
+      onHorizontalDragEnd: onDragComplete,
       child: AnimatedBuilder(
         animation: swipeTween!,
 
@@ -186,9 +241,8 @@ class _DragAndSwipeState extends State<DragAndSwipe>
         ),
 
         // For better hit test.
-        child: Container(
+        child: ColoredBox(
           color: Colors.transparent,
-          width: double.infinity,
           child: Align(
             alignment: widget.alignment,
 
