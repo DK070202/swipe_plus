@@ -23,24 +23,23 @@ SwipePlus(
 ## Available Configuration.
 
 
-1. `onDragComplete` On drag complete call back
-
+1.`onDragComplete` On drag complete call back
 ```dart
-  /// When horizontal drag is enough to cross [minThreshold] then it will called.
+  /// When horizontal drag is enough to cross [minThreshold] then it will be called.
   final VoidCallback? onDragComplete;
 
 ```
 
-2. `onDragCancel` call back for drag cancel.
+2.`onDragCancel` callback for drag cancel.
 
 ```dart
-/// When horizontal drag is not enough to cross [minThreshold] and call back
+/// When horizontal drag is not enough to cross [minThreshold] and callback
 /// canceled from user.
 final VoidCallback? onDragCancel;
 ```
 
 
-3. `alignment` For aligning child.
+3.`alignment` For aligning child.
 
 ```dart
   /// This uses [Align] and [ColoredBox] internally to set Alignment of Widget
@@ -49,7 +48,7 @@ final VoidCallback? onDragCancel;
   final Alignment alignment;
 ```
 
-4. `dragDirection` It decides the drag direction of child.
+4.`dragDirection` It decides the drag direction of child.
 
 ```dart
   /// * If [DragDirection.RTL] then it can dragged from right side to left side.
@@ -57,7 +56,7 @@ final VoidCallback? onDragCancel;
   final Alignment alignment;
 ```
 
-5. `maxTranslation`  Value of width percentage,for max translation in direction.
+5.`maxTranslation`  Value of width percentage of child,for max translation in direction.
 
 ```dart
  /// It defines bounds of translation in direction. If it is set to .3 then at
@@ -66,7 +65,7 @@ final VoidCallback? onDragCancel;
 ```
 
 
-6. `reverseDuration` Duration for reverse translation.
+6.`reverseDuration` Duration for reverse translation.
 
 ```dart
   /// If drag not completes or if it not crosses the [minThreshold] percentage
@@ -74,7 +73,7 @@ final VoidCallback? onDragCancel;
   final Duration reverseDuration;
 ```
 
-7. `minThreshold`  A percentage of minThreshold for calling completeCallback.
+7.`minThreshold`  A percentage of minThreshold for calling completeCallback.
 
 ```dart
   /// It helps to define boundary for calling [onDragComplete]. If it is set
