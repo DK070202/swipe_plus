@@ -1,10 +1,17 @@
-# Swipe and Drag.
+# Swipe Plus.
 
-## For creating a drag effect.
+## For creating a message drag effect.
 
 
 https://user-images.githubusercontent.com/78605453/187291976-5cdc8c5c-763b-41a1-a00c-d16e35976842.mp4
 
+## Installation
+```yaml
+  swipe_plus:
+    git:
+      url: https://github.com/DK070202/drag_and_swipe.git
+      ref: master
+```
 
 
 ## Usage.
@@ -19,10 +26,8 @@ SwipePlus(
     }
 )
 ```
-<br></br>
+
 ## Available Configuration.
-
-
 1.`onDragComplete` On drag complete call back
 ```dart
   /// When horizontal drag is enough to cross [minThreshold] then it will be called.
@@ -53,7 +58,7 @@ final VoidCallback? onDragCancel;
 ```dart
   /// * If [DragDirection.RTL] then it can dragged from right side to left side.
   /// * If [DragDirection.LTR] then it can be dragged from left to to right.
-  final Alignment alignment;
+  final DragDirection alignment;
 ```
 
 5.`maxTranslation`  Value of width percentage of child,for max translation in direction.
