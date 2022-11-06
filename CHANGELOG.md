@@ -1,3 +1,5 @@
+# 0.8.1
+- Updated docs.
 # 0.8.0
 - Added callback functionality when drag cancelled.
 - Provide configuration for max translation.
