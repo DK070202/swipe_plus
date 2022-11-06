@@ -3,7 +3,10 @@
 ## For creating a message drag effect.
 
 
-https://user-images.githubusercontent.com/78605453/187291976-5cdc8c5c-763b-41a1-a00c-d16e35976842.mp4
+<img src="https://user-images.githubusercontent.com/78605453/200184431-df6342f2-969b-476e-b1b8-64a747936601.gif" width="256" height="512" title="Swipe To iOS Output">
+
+
+
 
 ## Installation
 ```yaml
