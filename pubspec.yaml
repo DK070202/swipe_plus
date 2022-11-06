@@ -1,6 +1,7 @@
 name: swipe_plus
 description: Simple way to implement horizontal drag interaction.
 version: 0.8.0
+repository: https://github.com/DK070202/swipe_plus 
 
 environment:
   sdk: ">=2.17.2 <3.0.0"
