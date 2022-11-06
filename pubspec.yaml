@@ -1,6 +1,6 @@
 name: swipe_plus
-description: A new Flutter package project.
-version: 0.0.2
+description: Simple way to implement horizontal drag interaction.
+version: 0.8.0
 
 environment:
   sdk: ">=2.17.2 <3.0.0"
